@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import * as ExpoLinking from 'expo-linking';
 import {
   ConnectedWalletSession,
@@ -15,6 +16,7 @@ import {
   migrateFromAsyncStorage,
   secureClearAll,
 } from '../services/secureStorage';
+import { formatWalletSwapWarning, shouldWarnAboutWalletSwap } from '../services/walletReconnectWarning';
 
 /**
  * Lifecycle state of the session-restore bootstrap.
@@ -226,6 +228,26 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
       try {
         const session = await approval();
+
+        if (shouldWarnAboutWalletSwap(publicKey, session.publicKey)) {
+          const shouldContinue = await new Promise<boolean>((resolve) => {
+            Alert.alert(
+              'Different wallet detected',
+              formatWalletSwapWarning(publicKey, session.publicKey),
+              [
+                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+                { text: 'Continue', onPress: () => resolve(true) },
+              ],
+            );
+          });
+
+          if (!shouldContinue) {
+            setStatus('idle');
+            setError(null);
+            return;
+          }
+        }
+
         setTopic(session.topic);
         setPublicKey(session.publicKey);
         setWalletName(session.walletName);
