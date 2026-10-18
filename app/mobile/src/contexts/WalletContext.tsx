@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import * as ExpoLinking from 'expo-linking';
+import { useTranslation } from '../i18n/useTranslation';
 import {
   ConnectedWalletSession,
   WalletConnectionStatus,
@@ -83,6 +84,7 @@ const idleState = {
 };
 
 export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<WalletConnectionStatus>('idle');
   const [restoreStatus, setRestoreStatus] = useState<RestoreStatus>('restoring');
   const [secureStorageUnavailable, setSecureStorageUnavailable] = useState(false);
@@ -232,11 +234,11 @@ export const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
         if (shouldWarnAboutWalletSwap(publicKey, session.publicKey)) {
           const shouldContinue = await new Promise<boolean>((resolve) => {
             Alert.alert(
-              'Different wallet detected',
-              formatWalletSwapWarning(publicKey, session.publicKey),
+              t('wallet.differentWalletDetected'),
+              formatWalletSwapWarning(publicKey, session.publicKey, t),
               [
-                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-                { text: 'Continue', onPress: () => resolve(true) },
+                { text: t('common.cancel'), style: 'cancel', onPress: () => resolve(false) },
+                { text: t('common.continue'), onPress: () => resolve(true) },
               ],
             );
           });

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from '../i18n/useTranslation';
 import { useAppTheme } from '../theme/useAppTheme';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 
 export const ConnectionQualityBanner: React.FC<Props> = ({ visible }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
 
   if (!visible) return null;
 
@@ -16,13 +18,13 @@ export const ConnectionQualityBanner: React.FC<Props> = ({ visible }) => {
       style={[styles.banner, { backgroundColor: colors.warningBg, borderBottomColor: colors.warningBorder }]}
       accessible
       accessibilityRole="alert"
-      accessibilityLabel="Slow connection. The network is available but responding slowly."
+      accessibilityLabel={t('network.qualityDegradedLabel')}
     >
-      <Text style={[styles.icon, { color: colors.warning }]} accessibilityElementsHidden maxFontSizeMultiplier={2}>Slow</Text>
+      <Text style={[styles.icon, { color: colors.warning }]} accessibilityElementsHidden maxFontSizeMultiplier={2}>{t('network.qualityDegradedBadge')}</Text>
       <View>
-        <Text style={[styles.title, { color: colors.warning }]} maxFontSizeMultiplier={2}>Slow connection</Text>
+        <Text style={[styles.title, { color: colors.warning }]} maxFontSizeMultiplier={2}>{t('network.qualityDegradedTitle')}</Text>
         <Text style={[styles.subtitle, { color: colors.warning }]} maxFontSizeMultiplier={2}>
-          Actions may take longer while the network recovers.
+          {t('network.qualityDegradedMessage')}
         </Text>
       </View>
     </View>

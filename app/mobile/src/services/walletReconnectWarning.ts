@@ -26,13 +26,26 @@ export const shouldWarnAboutWalletSwap = (previousAddress?: string | null, nextA
   return oldAddress.toLowerCase() !== newAddress.toLowerCase();
 };
 
-export const formatWalletSwapWarning = (previousAddress?: string | null, nextAddress?: string | null): string => {
+type TranslationLike = (key: string, params?: Record<string, string>) => string;
+
+export const formatWalletSwapWarning = (
+  previousAddress?: string | null,
+  nextAddress?: string | null,
+  translate?: TranslationLike,
+): string => {
   if (!shouldWarnAboutWalletSwap(previousAddress, nextAddress)) {
-    return 'This wallet matches the one already connected to this device.';
+    return translate ? translate('wallet.sameWalletWarning') : 'This wallet matches the one already connected to this device.';
   }
 
   const oldMasked = maskWalletAddress(previousAddress ?? '');
   const newMasked = maskWalletAddress(nextAddress ?? '');
+
+  if (translate) {
+    return translate('wallet.differentWalletWarning', {
+      previousAddress: oldMasked,
+      newAddress: newMasked,
+    });
+  }
 
   return `This is a different wallet than before. You previously connected ${oldMasked}, but this session is trying to connect ${newMasked}. Continue only if you intend to switch wallets.`;
 };
